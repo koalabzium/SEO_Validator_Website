@@ -14,7 +14,10 @@ export default function () {
 
         const body = {
             'starting-url': req.url,
-            'crawl-depth': parseInt(req.depth)
+            'crawl-depth': parseInt(req.depth),
+            'config': {
+                'measure_speed': req.checkSpeed
+            }
         };
         axios.post(validateUrl, body)
             .then(res => {

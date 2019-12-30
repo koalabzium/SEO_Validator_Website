@@ -8,6 +8,9 @@ import Typography from "@material-ui/core/Typography";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Switch from "@material-ui/core/Switch";
+import FormGroup from "@material-ui/core/FormGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 export default function (props) {
 
@@ -44,14 +47,22 @@ export default function (props) {
                     <Typography className={classes.heading}>Additional configuration</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={classes.details}>
-props.onSubmit
-                    <Typography className={classes.heading}>Kocham Zosię</Typography>
+                    <FormGroup row>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={props.checkSpeed}
+                                    onChange={props.onCheckSpeedChange}
+                                    value="Check Speed"
+                                    inputProps={{ 'aria-label': 'secondary checkbox' }}/>  }
+                            label=" Measure site speed "/>
+                    </FormGroup>
                 </ExpansionPanelDetails>
             </ExpansionPanel>
 
 
-            <Button className={classes.button} variant="contained" color="primary" onClick={props.onSubmit}>
-                Submit
+            <Button className={classes.button} variant="contained" color="secondary" onClick={props.onSubmit}>
+                Analyze
             </Button>
 
         </form>)
