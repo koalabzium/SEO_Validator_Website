@@ -18,6 +18,9 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ReportProblemIcon from '@material-ui/icons/ReportProblem';
+import LabelImportantIcon from '@material-ui/icons/LabelImportant';
+
+
 
 const ValidationResultView = (props) => {
 
@@ -149,7 +152,8 @@ const ValidationResultView = (props) => {
         missingTitle: " Found " + titleMissingCounter + " pages with no title.",
         unsafeUrl: " Found " + unsafeUrlCounter + " pages with unsafe URL.",
         wrongUrl: " Found " + wrongUrlCounter + " pages with wrong URL.",
-        descriptionWrongSize: " Found " + descriptionWrongSizeCounter + " pages with wrong size of description."
+        descriptionWrongSize: " Found " + descriptionWrongSizeCounter + " pages with wrong size of description.",
+        w3c: " W3C Validation results"
 
     }
     const popup = popupMessage => {
@@ -240,6 +244,18 @@ const ValidationResultView = (props) => {
         )}
         {popup(popupMessages.missingHeading)}
     </List>);
+    const w3c = (<List component="nav" aria-label="main mailbox folders">
+        {props.results.results.w3c.map((item, index) =>
+            <ListItem key={index} className={classes.listItem}>
+                <ListItemIcon><LabelImportantIcon/></ListItemIcon>
+                <ListItemText primary={item.message} secondary={
+                    <b>{item.extract}</b>
+                }/>
+                Line: {item.lastLine}
+            </ListItem>
+        )}
+        {popup(popupMessages.missingHeading)}
+    </List>);
     const descriptionWrongSize = (<List component="nav" aria-label="main mailbox folders">
         {props.results.results.description_wrong_size.map((item, index) =>
             <ListItem key={index} className={classes.listItem}>
@@ -284,12 +300,13 @@ const ValidationResultView = (props) => {
         )}
         {popup(popupMessages.wrongUrl)}
     </List>);
-
+    const w3cResults = props.results.parameters.config.w3c ? panel(panelHeadings.w3c, w3c, wrongUrlCounter === 0) : null
     const results = (<div className={classes.root}>
         <div className={classes.row}>
             {first_byte_results}
             {speed_results_component}
         </div>
+        {w3cResults}
         {panel(" Robots.txt file", popup(popupMessages.robots), !props.results.results.missing_robots)}
         {panel(" Sitemap.xml file", popup(popupMessages.robots), !props.results.results.missing_sitemap)}
         {panel(panelHeadings.headingsStructure, wrongHeadingsStructure, (wrongHeadingsStructureCounter === 0))}
@@ -300,6 +317,7 @@ const ValidationResultView = (props) => {
         {panel(panelHeadings.descriptionWrongSize, descriptionWrongSize, (descriptionWrongSizeCounter === 0))}
         {panel(panelHeadings.unsafeUrl, unsafeUrl, (unsafeUrlCounter === 0))}
         {panel(panelHeadings.wrongUrl, wrongUrl, wrongUrlCounter === 0)}
+
 
 
     </div>)

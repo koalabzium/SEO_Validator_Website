@@ -16,7 +16,8 @@ export default function () {
             'starting-url': req.url,
             'crawl-depth': parseInt(req.depth),
             'config': {
-                'measure_speed': req.checkSpeed
+                'measure_speed': req.checkSpeed,
+                'w3c': req.checkW3C
             }
         };
         axios.post(validateUrl, body)

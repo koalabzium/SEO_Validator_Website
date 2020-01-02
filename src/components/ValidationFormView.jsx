@@ -47,16 +47,30 @@ export default function (props) {
                     <Typography className={classes.heading}>Additional configuration</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={classes.details}>
-                    <FormGroup row>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    checked={props.checkSpeed}
-                                    onChange={props.onCheckSpeedChange}
-                                    value="Check Speed"
-                                    inputProps={{ 'aria-label': 'secondary checkbox' }}/>  }
-                            label=" Measure site speed "/>
+                    <FormGroup column>
+                        <FormGroup row>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={props.checkSpeed}
+                                        onChange={props.onCheckSpeedChange}
+                                        value="Check Speed"
+                                        inputProps={{'aria-label': 'secondary checkbox'}}/>}
+                                label=" Measure site speed "/>
+
+                        </FormGroup>
+                        <FormGroup row>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={props.checkW3CChange}
+                                        onChange={props.onCheckW3CChange}
+                                        value="Check W3C"
+                                        inputProps={{'aria-label': 'secondary checkbox'}}/>}
+                                label=" Check for W3C validation "/>
+                        </FormGroup>
                     </FormGroup>
+
                 </ExpansionPanelDetails>
             </ExpansionPanel>
 
