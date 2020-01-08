@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import CircularProgress from "@material-ui/core/CircularProgress";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
@@ -21,14 +21,15 @@ import ReportProblemIcon from '@material-ui/icons/ReportProblem';
 import LabelImportantIcon from '@material-ui/icons/LabelImportant';
 
 
-
 const ValidationResultView = (props) => {
 
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [popupMessage, setPopupMessage] = useState('');
 
-    const handleClick = event => {
+    const handleClick = (event, popupMessage) => {
         setAnchorEl(event.currentTarget);
+        setPopupMessage(popupMessage)
     };
 
     const handleClose = () => {
@@ -56,7 +57,7 @@ const ValidationResultView = (props) => {
         missingTitle: "mis Ti",
         descriptionWrongSize: "dws",
         unsafeUrl: "Unsaaafe",
-        wrongUrl: "BAD url chars",
+        wrongUrl: "Good URL should'n contain characters other then letters, \n numbers and dashes. Also, it should't be longer then 120 characters.",
         wrongTitle: "Bad chars ",
         sitemap: "sitemap",
         robots: "r"
@@ -130,6 +131,7 @@ const ValidationResultView = (props) => {
     const titleMissingCounter = props.results.results.page_missing_title.length;
     const unsafeUrlCounter = props.results.results.http_urls.length;
     const wrongUrlCounter = props.results.results.urls_wrong_chars.length;
+    const brokenUrlCounter = props.results.results.broken_urls.length;
 
 
     const icon = success => {
@@ -153,30 +155,17 @@ const ValidationResultView = (props) => {
         unsafeUrl: " Found " + unsafeUrlCounter + " pages with unsafe URL.",
         wrongUrl: " Found " + wrongUrlCounter + " pages with wrong URL.",
         descriptionWrongSize: " Found " + descriptionWrongSizeCounter + " pages with wrong size of description.",
-        w3c: " W3C Validation results"
+        w3c: " W3C Validation results",
+        brokenUrl: " Found " + brokenUrlCounter + " pages containing broken URLs."
 
     }
-    const popup = popupMessage => {
+    const popup = (message) => {
         return (
             <ListItem>
                 <Button variant="outlined" size="small" color="secondary" aria-describedby={id} type="button"
-                        onClick={handleClick}>
+                        onClick={(event) => handleClick(event, message)}>
                     Find out more
                 </Button>
-                <Popover
-                    id={id} open={open} anchorEl={anchorEl} onClose={handleClose}
-                    anchorOrigin={{vertical: 'top', horizontal: 'right',}}
-                    transformOrigin={{vertical: 'top', horizontal: 'left',}}>
-                    {popupMessage}
-                </Popover>
-                {/*<Popper id={id} open={open} anchorEl={anchorEl} transition>*/}
-                {/*    {({ TransitionProps }) => (*/}
-                {/*        <Fade {...TransitionProps} timeout={350}>*/}
-                {/*            <div className={classes.paper}>{popupMessage}</div>*/}
-                {/*        </Fade>*/}
-                {/*    )}*/}
-                {/*</Popper>*/}
-
 
             </ListItem>
         )
@@ -199,6 +188,26 @@ const ValidationResultView = (props) => {
             </ExpansionPanel>
         )
     }
+    const brokenUrl = (<List component="nav" aria-label="main mailbox folders">
+        {props.results.results.broken_urls.map((item, index) =>
+            <ListItem key={index} className={classes.listItem}>
+                <ListItemText primary={
+                    <Typography><b>On page</b> {item.url} <b>those urls are broken: </b></Typography>} secondary={
+                    <List component="nav" aria-label="main mailbox folders">
+                        {item.info.map((item2, index2) =>
+                            <ListItem key={index2} className={classes.listItem}>
+                                <ListItemIcon>
+                                    <LinkIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary={item2}/>
+                            </ListItem>
+                        )}
+                    </List>
+                }/>
+            </ListItem>
+        )}
+        {popup("Something more about og")}
+    </List>);
     const withoutOpenGraph = (<List component="nav" aria-label="main mailbox folders">
         {props.results.results.no_open_graph.map((item, index) =>
             <ListItem key={index} className={classes.listItem}>
@@ -301,23 +310,31 @@ const ValidationResultView = (props) => {
         {popup(popupMessages.wrongUrl)}
     </List>);
     const w3cResults = props.results.parameters.config.w3c ? panel(panelHeadings.w3c, w3c, wrongUrlCounter === 0) : null
+
+
     const results = (<div className={classes.root}>
         <div className={classes.row}>
             {first_byte_results}
             {speed_results_component}
         </div>
-        {w3cResults}
-        {panel(" Robots.txt file", popup(popupMessages.robots), !props.results.results.missing_robots)}
-        {panel(" Sitemap.xml file", popup(popupMessages.robots), !props.results.results.missing_sitemap)}
+        {panel(panelHeadings.wrongUrl, wrongUrl, wrongUrlCounter === 0)}
+        {panel(panelHeadings.brokenUrl, brokenUrl, (brokenUrlCounter === 0))}
         {panel(panelHeadings.headingsStructure, wrongHeadingsStructure, (wrongHeadingsStructureCounter === 0))}
         {panel(panelHeadings.openGraph, withoutOpenGraph, (noOpenGraphCounter === 0))}
+        {panel(panelHeadings.descriptionWrongSize, descriptionWrongSize, (descriptionWrongSizeCounter === 0))}
         {panel(panelHeadings.missingDescritpions, missingDescription, (descriptionMissingCounter === 0))}
+        {w3cResults}
         {panel(panelHeadings.missingHeading, missingHeading, (headingMissingCounter === 0))}
         {panel(panelHeadings.missingTitle, missingTitle, (titleMissingCounter === 0))}
-        {panel(panelHeadings.descriptionWrongSize, descriptionWrongSize, (descriptionWrongSizeCounter === 0))}
         {panel(panelHeadings.unsafeUrl, unsafeUrl, (unsafeUrlCounter === 0))}
-        {panel(panelHeadings.wrongUrl, wrongUrl, wrongUrlCounter === 0)}
-
+        {panel(" Sitemap.xml file", popup(popupMessages.robots), !props.results.results.missing_sitemap)}
+        {panel(" Robots.txt file", popup(popupMessages.robots), !props.results.results.missing_robots)}
+        <Popover
+            id={id} className={classes.popup} open={open} anchorEl={anchorEl} onClose={handleClose}
+            anchorOrigin={{vertical: 'top', horizontal: 'right',}}
+            transformOrigin={{vertical: 'top', horizontal: 'left',}}>
+            <Typography className={classes.typography}>{popupMessage}</Typography>
+        </Popover>
 
 
     </div>)
@@ -375,7 +392,13 @@ const useStyles = makeStyles(theme => ({
     },
     typography: {
         padding: theme.spacing(2),
+        width: '50%',
+        backgroundColor: "#f8f1d7",
     },
+
+    popup: {
+        color: "#f8f8bd",
+    }
 
 }));
 
